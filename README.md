@@ -1,2 +1,3 @@
 # Resume
-Work in progress!
+
+An ever evolving website, for practice and show!
