@@ -310,15 +310,20 @@ section {
 /* Contact Section */
 .contact-content {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 4rem;
     max-width: 1000px;
     margin: 0 auto;
+    justify-items: center;
 }
 
 .contact-info h3 {
     margin-bottom: 1rem;
     color: #333;
+}
+
+.contact-info {
+    text-align: center;
 }
 
 .contact-info p {
@@ -335,6 +340,7 @@ section {
     align-items: center;
     gap: 1rem;
     margin-bottom: 1rem;
+    justify-content: center;
 }
 
 .contact-item i {
@@ -345,6 +351,7 @@ section {
 .social-links {
     display: flex;
     gap: 1rem;
+    justify-content: center;
 }
 
 .social-link {

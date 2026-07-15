@@ -71,34 +71,36 @@ window.addEventListener('scroll', () => {
 });
 
 // Form Submission with Formspree
-contactForm.addEventListener('submit', function(e) {
-    // Don't prevent default - let Formspree handle it
-    // But add some basic validation first
-    
-    const name = this.querySelector('input[name="name"]').value;
-    const email = this.querySelector('input[name="email"]').value;
-    const subject = this.querySelector('input[name="subject"]').value;
-    const message = this.querySelector('textarea[name="message"]').value;
-    
-    // Simple form validation
-    if (!name || !email || !subject || !message) {
-        e.preventDefault();
-        showNotification('Please fill in all fields.', 'error');
-        return false;
-    }
-    
-    if (!isValidEmail(email)) {
-        e.preventDefault();
-        showNotification('Please enter a valid email address.', 'error');
-        return false;
-    }
-    
-    // Show sending message
-    showNotification('Sending message...', 'info');
-    
-    // Form will submit to Formspree automatically
-    return true;
-});
+if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+        // Don't prevent default - let Formspree handle it
+        // But add some basic validation first
+        
+        const name = this.querySelector('input[name="name"]').value;
+        const email = this.querySelector('input[name="email"]').value;
+        const subject = this.querySelector('input[name="subject"]').value;
+        const message = this.querySelector('textarea[name="message"]').value;
+        
+        // Simple form validation
+        if (!name || !email || !subject || !message) {
+            e.preventDefault();
+            showNotification('Please fill in all fields.', 'error');
+            return false;
+        }
+        
+        if (!isValidEmail(email)) {
+            e.preventDefault();
+            showNotification('Please enter a valid email address.', 'error');
+            return false;
+        }
+        
+        // Show sending message
+        showNotification('Sending message...', 'info');
+        
+        // Form will submit to Formspree automatically
+        return true;
+    });
+}
 
 // Email validation function
 function isValidEmail(email) {
