@@ -124,6 +124,9 @@ p {
     display: none;
     flex-direction: column;
     cursor: pointer;
+    border: 0;
+    background: transparent;
+    padding: 0.35rem;
 }
 
 .bar {
@@ -396,6 +399,105 @@ section {
     min-height: 120px;
 }
 
+/* Error recovery game */
+.error-game-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 20000;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(25, 35, 30, 0.72);
+}
+
+.error-game {
+    position: relative;
+    width: min(100%, 440px);
+    padding: 2rem;
+    border: 3px solid #4CAF50;
+    border-radius: 14px;
+    background: #fffdf5;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.error-game-close {
+    position: absolute;
+    top: 0.65rem;
+    right: 0.85rem;
+    border: 0;
+    background: transparent;
+    color: #333;
+    cursor: pointer;
+    font-size: 1.7rem;
+    line-height: 1;
+}
+
+.error-game-kicker {
+    margin-bottom: 0.35rem;
+    color: #4CAF50;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.error-game h2 {
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.error-game-message {
+    margin-bottom: 1rem;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.error-game-score {
+    margin-bottom: 0.75rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.error-game-board {
+    position: relative;
+    height: 150px;
+    overflow: hidden;
+    border: 2px dashed #f0b429;
+    border-radius: 8px;
+    background: #fff3c4;
+}
+
+.bug-target {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 46px;
+    height: 46px;
+    border: 0;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+    font-size: 1.45rem;
+    transform: translate(-50%, -50%);
+}
+
+.bug-target:disabled {
+    cursor: default;
+    opacity: 0.55;
+}
+
+.error-game-status {
+    min-height: 1.6em;
+    margin: 0.75rem 0 1rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.error-game-refresh {
+    width: 100%;
+}
+
 /* Footer */
 .footer {
     background: #333;
@@ -435,28 +537,33 @@ section {
 /* Responsive Design */
 @media (max-width: 768px) {
     .nav-menu {
-        position: fixed;
-        left: -100%;
-        top: 70px;
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        right: 20px;
+        left: auto;
+        width: min(220px, calc(100vw - 40px));
+        display: none;
         flex-direction: column;
         background-color: white;
-        width: 100%;
         text-align: center;
-        transition: 0.3s;
-        box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
-        padding: 2rem 0;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
+        padding: 0.75rem 0;
+        border: 1px solid #e7e7e7;
+        border-radius: 8px;
     }
 
     .nav-menu.active {
-        left: 0;
+        display: flex;
     }
 
     .nav-item {
-        margin: 1rem 0;
+        margin: 0;
     }
 
     .nav-toggle {
         display: flex;
+        position: relative;
+        z-index: 1;
     }
 
     .nav-toggle.active .bar:nth-child(2) {

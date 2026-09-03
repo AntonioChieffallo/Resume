@@ -7,8 +7,9 @@ const contactForm = document.querySelector('.contact-form');
 
 // Mobile Navigation Toggle
 navToggle.addEventListener('click', () => {
-    navMenu.classList.toggle('active');
-    navToggle.classList.toggle('active');
+    const isOpen = navMenu.classList.toggle('active');
+    navToggle.classList.toggle('active', isOpen);
+    navToggle.setAttribute('aria-expanded', String(isOpen));
 });
 
 // Close mobile menu when clicking on a link
@@ -16,6 +17,7 @@ navLinks.forEach(link => {
     link.addEventListener('click', () => {
         navMenu.classList.remove('active');
         navToggle.classList.remove('active');
+        navToggle.setAttribute('aria-expanded', 'false');
     });
 });
 
@@ -71,10 +73,9 @@ window.addEventListener('scroll', () => {
 });
 
 // Form Submission with Formspree
-contactForm.addEventListener('submit', function(e) {
-    // Don't prevent default - let Formspree handle it
-    // But add some basic validation first
-    
+contactForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
     const name = this.querySelector('input[name="name"]').value;
     const email = this.querySelector('input[name="email"]').value;
     const subject = this.querySelector('input[name="subject"]').value;
@@ -82,22 +83,43 @@ contactForm.addEventListener('submit', function(e) {
     
     // Simple form validation
     if (!name || !email || !subject || !message) {
-        e.preventDefault();
-        showNotification('Please fill in all fields.', 'error');
-        return false;
+        showErrorGame('Please fill in all fields before sending your message.');
+        return;
     }
     
     if (!isValidEmail(email)) {
-        e.preventDefault();
-        showNotification('Please enter a valid email address.', 'error');
-        return false;
+        showErrorGame('Please enter a valid email address before sending your message.');
+        return;
     }
     
     // Show sending message
     showNotification('Sending message...', 'info');
     
-    // Form will submit to Formspree automatically
-    return true;
+    try {
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this),
+            headers: { Accept: 'application/json' }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Form submission failed with status ${response.status}`);
+        }
+
+        window.location.href = this.querySelector('input[name="_next"]').value;
+    } catch (error) {
+        console.error(error);
+        showErrorGame('The message could not be sent right now. Your form is still here to try again.');
+    }
+});
+
+// Keep unexpected page errors recoverable instead of leaving visitors at a dead end.
+window.addEventListener('error', event => {
+    showErrorGame('Something unexpected happened while loading this page.');
+});
+
+window.addEventListener('unhandledrejection', () => {
+    showErrorGame('Something unexpected happened while processing that action.');
 });
 
 // Email validation function
@@ -150,6 +172,63 @@ function showNotification(message, type = 'info') {
             notification.remove();
         }, 300);
     }, 5000);
+}
+
+function showErrorGame(message) {
+    const existingGame = document.querySelector('.error-game-overlay');
+    if (existingGame) {
+        return;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'error-game-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-labelledby', 'error-game-title');
+    overlay.innerHTML = `
+        <div class="error-game" tabindex="-1">
+            <button class="error-game-close" type="button" aria-label="Close error game">&times;</button>
+            <p class="error-game-kicker">A wild error appeared</p>
+            <h2 id="error-game-title">Catch the bugs</h2>
+            <p class="error-game-message"></p>
+            <div class="error-game-score">Bugs caught: <strong>0</strong> / 5</div>
+            <div class="error-game-board" aria-label="Game board">
+                <button class="bug-target" type="button" aria-label="Catch bug">&#128027;</button>
+            </div>
+            <p class="error-game-status" aria-live="polite">Click the bug five times to debug the page.</p>
+            <button class="btn btn-secondary error-game-refresh" type="button">Refresh page</button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    const game = overlay.querySelector('.error-game');
+    const target = overlay.querySelector('.bug-target');
+    const score = overlay.querySelector('.error-game-score strong');
+    const status = overlay.querySelector('.error-game-status');
+    const messageElement = overlay.querySelector('.error-game-message');
+    let bugsCaught = 0;
+
+    messageElement.textContent = message;
+    game.focus();
+
+    target.addEventListener('click', () => {
+        bugsCaught += 1;
+        score.textContent = bugsCaught;
+
+        if (bugsCaught === 5) {
+            status.textContent = 'Nice work. The page is ready for another try.';
+            target.disabled = true;
+            return;
+        }
+
+        const board = overlay.querySelector('.error-game-board');
+        target.style.left = `${Math.random() * (board.clientWidth - 48)}px`;
+        target.style.top = `${Math.random() * (board.clientHeight - 48)}px`;
+        status.textContent = bugsCaught === 4 ? 'One more!' : 'Got it!';
+    });
+
+    overlay.querySelector('.error-game-close').addEventListener('click', () => overlay.remove());
+    overlay.querySelector('.error-game-refresh').addEventListener('click', () => window.location.reload());
 }
 
 // Simple page ready function
